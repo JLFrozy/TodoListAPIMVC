@@ -30,3 +30,6 @@ Thumbs.db
 # Build files
 dist/
 build/
+
+.key
+api/ssl/private.key

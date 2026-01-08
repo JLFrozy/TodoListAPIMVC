@@ -1,7 +1,13 @@
 import express from "express";
 import cors from "cors";
 import todoRouter from "./routes/todoRouter.js";
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 3000;
 
@@ -47,9 +53,28 @@ app.get("/", (req, res) => {
 // Toutes les routes /api/todos sont gérées par todoRouter
 app.use("/api/todos", todoRouter);
 
+
+//
+
+const PORT_HTTPS = 3001;
+// Configuration SSL
+const sslOptions = {
+ key: fs.readFileSync(path.join(__dirname, 'ssl', 'private.key')),
+ cert: fs.readFileSync(path.join(__dirname, 'ssl', 'certificate.crt'))
+};
+
+
 // ========================================
 // DÉMARRAGE DU SERVEUR
 // ========================================
+
+
+// Serveur HTTPS (port 3001)
+const httpsServer = https.createServer(sslOptions, app).listen(PORT_HTTPS, () => {
+ console.log(` Serveur HTTPS démarré sur le port ${PORT_HTTPS}`);
+});
+
+
 
 app.listen(PORT, () => {
   console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
