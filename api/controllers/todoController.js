@@ -1,4 +1,7 @@
 import Todo from "../models/Todo.js";
+import dotenv from 'dotenv';
+dotenv.config();
+import jwt from 'jsonwebtoken';
 
 // Simulation d'une base de données
 let todos = [
@@ -14,6 +17,67 @@ let nextId = 3;
 
 
 class TodoController {
+    login = async (req, res) => {
+        try {
+            // Récupération et validation des données
+            const { username, password } = req.body;
+
+            if (!username || !password) {
+                return res.status(400).json({
+                    success: false,
+                    error: "Veuillez fournir un nom d'utilisateur et un mot de passe.",
+                });
+            }
+
+            // Note : Dans un cas réel, l'appel serait plutôt de la forme `await db.getUser(...)`
+            if (username === "admin" && password === "azerty123") {
+                // Authentification ok : Création du token
+                const token = jwt.sign(
+                    { id: 0, username: username },
+                    process.env.SECRET,
+                    { expiresIn: "1 hour" }
+                );
+
+                // puis réponse valide
+                return res.json({
+                    success: true,
+                    data: { token }, // On encapsule le token dans "data" pour rester cohérent
+                });
+            } else {
+                // réponse invalide dans les autres cas
+                return res.status(401).json({
+                    success: false,
+                    error: "Identifiants incorrects.",
+                });
+            }
+        } catch (error) {
+            // Gestion des erreurs imprévues
+            res.status(500).json({
+                success: false,
+                error: "Erreur lors de l'authentification",
+                message: error.message,
+            });
+        }
+    };
+
+    verifyToken = (req, res, next) => {
+        // Récupérer le token dans le header (forme 'Authorization: Bearer <token>')
+        const authHeader = req.headers["authorization"];
+        const token = authHeader && authHeader.split(" ")[1];
+
+        if (!token) {
+            return res.status(401).json({ message: "Accès refusé. Token manquant." });
+        }
+
+        // Vérification de la validité du token
+        jwt.verify(token, process.env.SECRET, (err, user) => {
+            if (err) {
+                return res.status(403).json({ message: "Token invalide ou expiré." });
+            }
+            req.user = user; // On attache l'utilisateur à la requête pour la suite
+            next(); // On passe au contrôleur suivant (ex: afficher les todos)
+        });
+    };
     getAllTodos = (req, res) => {
         try {
             res.json({

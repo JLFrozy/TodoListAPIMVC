@@ -5,6 +5,9 @@ import https from 'https';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import morgan from 'morgan'; // logs pour authentification par token
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +20,8 @@ const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(morgan('tiny'));
+
 
 // ========================================
 // ROUTE DE DOCUMENTATION
@@ -45,6 +50,7 @@ app.get("/", (req, res) => {
     },
   });
 });
+
 
 // ========================================
 // MONTAGE DES ROUTEURS

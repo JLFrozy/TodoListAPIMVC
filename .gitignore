@@ -33,3 +33,4 @@ build/
 
 .key
 api/ssl/private.key
+api/.env.example

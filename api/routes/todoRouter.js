@@ -14,16 +14,19 @@ router.get("/", controller.getAllTodos);
 // GET /api/todos/:id - Récupérer une tâche spécifique
 router.get("/:id", controller.getTodoById);
 
-// POST /api/todos - Créer une nouvelle tâche
-router.post("/", controller.createTodo);
+// POST /api/todos - Créer une nouvelle tâche (Protégé)
+router.post("/", controller.verifyToken, controller.createTodo);
 
-// PUT /api/todos/:id - Remplacer complètement une tâche
-router.put("/:id", controller.replaceTodo);
+// PUT /api/todos/:id - Remplacer complètement une tâche (Protégé)
+router.put("/:id", controller.verifyToken, controller.replaceTodo);
 
-// PATCH /api/todos/:id - Modifier partiellement une tâche
-router.patch("/:id", controller.updateTodo);
+// PATCH /api/todos/:id - Modifier partiellement une tâche (Protégé)
+router.patch("/:id", controller.verifyToken, controller.updateTodo);
 
-// DELETE /api/todos/:id - Supprimer une tâche
-router.delete("/:id", controller.deleteTodo);
+// DELETE /api/todos/:id - Supprimer une tâche (Protégé)
+router.delete("/:id", controller.verifyToken, controller.deleteTodo);
+
+// Login
+router.post("/login", controller.login);
 
 export default router;
